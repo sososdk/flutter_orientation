@@ -1,3 +1,6 @@
+## 1.0.1
+* Fixed: Android orientation.
+
 ## 0.0.1
 
-* TODO: Describe initial release.
+* Initial release.

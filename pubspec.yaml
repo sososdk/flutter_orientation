@@ -1,7 +1,7 @@
 name: orientation
 description: A Flutter plugin for device&#x27;s orientation
 version: 1.0.1
-author: sososdk
+author: sososdk <email>
 homepage: https://github.com/sososdk/flutter_orientation
 
 environment:
