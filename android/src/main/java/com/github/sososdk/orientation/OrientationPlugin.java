@@ -100,7 +100,6 @@ public class OrientationPlugin implements MethodCallHandler {
 
   private void setSystemChromePreferredOrientations(JSONArray orientations) throws JSONException {
     int requestedOrientation = 0x00;
-    int firstRequestedOrientation = 0x00;
     for (int index = 0; index < orientations.length(); index += 1) {
       if (orientations.getString(index).equals("DeviceOrientation.portraitUp")) {
         requestedOrientation |= 0x01;
@@ -110,9 +109,6 @@ public class OrientationPlugin implements MethodCallHandler {
         requestedOrientation |= 0x04;
       } else if (orientations.getString(index).equals("DeviceOrientation.landscapeRight")) {
         requestedOrientation |= 0x08;
-      }
-      if (firstRequestedOrientation == 0x00) {
-        firstRequestedOrientation = requestedOrientation;
       }
     }
     switch (requestedOrientation) {
@@ -163,9 +159,9 @@ public class OrientationPlugin implements MethodCallHandler {
     } else if (orientation.equals("DeviceOrientation.portraitDown")) {
       activity.setRequestedOrientation(SCREEN_ORIENTATION_REVERSE_PORTRAIT);
     } else if (orientation.equals("DeviceOrientation.landscapeLeft")) {
-      activity.setRequestedOrientation(SCREEN_ORIENTATION_LANDSCAPE);
-    } else if (orientation.equals("DeviceOrientation.landscapeRight")) {
       activity.setRequestedOrientation(SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+    } else if (orientation.equals("DeviceOrientation.landscapeRight")) {
+      activity.setRequestedOrientation(SCREEN_ORIENTATION_LANDSCAPE);
     } else {
       activity.setRequestedOrientation(SCREEN_ORIENTATION_UNSPECIFIED);
     }
@@ -187,9 +183,9 @@ public class OrientationPlugin implements MethodCallHandler {
     } else if (orientation == SCREEN_ORIENTATION_REVERSE_PORTRAIT) {
       return "DeviceOrientation.portraitDown";
     } else if (orientation == SCREEN_ORIENTATION_LANDSCAPE) {
-      return "DeviceOrientation.landscapeLeft";
-    } else if (orientation == SCREEN_ORIENTATION_REVERSE_LANDSCAPE) {
       return "DeviceOrientation.landscapeRight";
+    } else if (orientation == SCREEN_ORIENTATION_REVERSE_LANDSCAPE) {
+      return "DeviceOrientation.landscapeLeft";
     } else {
       return null;
     }

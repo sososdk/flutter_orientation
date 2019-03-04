@@ -9,14 +9,34 @@ void main() => runApp(MaterialApp(
       home: MyApp(),
     ));
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   @override
-  State<StatefulWidget> createState() {
-    return _MyAppState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Orientation Example'),
+      ),
+      body: Center(
+        child: RaisedButton(
+            child: Text('Next'),
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (_) {
+                return NextPage();
+              }));
+            }),
+      ),
+    );
   }
 }
 
-class _MyAppState extends State<MyApp> {
+class NextPage extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return _NextPageState();
+  }
+}
+
+class _NextPageState extends State<NextPage> {
   DeviceOrientation _deviceOrientation;
 
   StreamSubscription<DeviceOrientation> subscription;
