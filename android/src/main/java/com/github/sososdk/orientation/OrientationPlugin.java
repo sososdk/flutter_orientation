@@ -3,6 +3,7 @@ package com.github.sososdk.orientation;
 import android.app.Activity;
 import android.util.Log;
 import android.view.OrientationEventListener;
+import android.view.View;
 import io.flutter.plugin.common.EventChannel;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -82,7 +83,10 @@ public class OrientationPlugin implements MethodCallHandler {
   public void onMethodCall(MethodCall call, Result result) {
     String method = call.method;
     Object arguments = call.arguments;
-    if (method.equals("SystemChrome.setPreferredOrientations")) {
+    if (method.equals("SystemChrome.setEnabledSystemUIOverlays")) {
+      setSystemChromeEnabledSystemUIOverlays((List) arguments);
+      result.success(null);
+    } else if (method.equals("SystemChrome.setPreferredOrientations")) {
       setSystemChromePreferredOrientations((List) arguments);
       result.success(null);
     } else if (method.equals("SystemChrome.forceOrientation")) {
@@ -91,6 +95,29 @@ public class OrientationPlugin implements MethodCallHandler {
     } else {
       result.notImplemented();
     }
+  }
+
+  private void setSystemChromeEnabledSystemUIOverlays(List overlaysToShow) {
+    // Start by assuming we want to hide all system overlays (like an immersive game).
+    int enabledOverlays = View.SYSTEM_UI_FLAG_VISIBLE
+        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+        | View.SYSTEM_UI_FLAG_IMMERSIVE | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+
+    if (overlaysToShow.size() == 0) {
+      enabledOverlays |= View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+    } else {
+      // Re-add any desired system overlays.
+      for (int i = 0; i < overlaysToShow.size(); ++i) {
+        if (overlaysToShow.get(i).equals("SystemUiOverlay.top")) {
+          enabledOverlays |= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+        } else if (overlaysToShow.get(i).equals("SystemUiOverlay.bottom")) {
+          enabledOverlays |= View.SYSTEM_UI_FLAG_FULLSCREEN;
+        }
+      }
+    }
+    activity.getWindow().getDecorView().setSystemUiVisibility(enabledOverlays);
   }
 
   private void setSystemChromePreferredOrientations(List orientations) {

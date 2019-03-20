@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -9,6 +10,18 @@ class OrientationPlugin {
 
   static const _eventChannel =
       const EventChannel('com.github.sososdk/orientationEvent');
+
+  static Future<void> setEnabledSystemUIOverlays(
+      List<SystemUiOverlay> overlays) async {
+    if (Platform.isAndroid) {
+      await _methodChannel.invokeMethod<void>(
+        'SystemChrome.setEnabledSystemUIOverlays',
+        _stringify(overlays),
+      );
+    } else {
+      SystemChrome.setEnabledSystemUIOverlays(overlays);
+    }
+  }
 
   static Future<void> setPreferredOrientations(
       List<DeviceOrientation> orientations) async {
