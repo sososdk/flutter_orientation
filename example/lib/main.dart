@@ -5,9 +5,10 @@ import 'package:flutter/services.dart';
 import 'package:orientation/orientation.dart';
 
 // https://github.com/flutter/flutter/issues/28134
-void main() => runApp(MaterialApp(
-      home: MyApp(),
-    ));
+void main() {
+  OrientationPlugin.setPreferredOrientations(DeviceOrientation.values);
+  runApp(MaterialApp(home: MyApp()));
+}
 
 class MyApp extends StatelessWidget {
   @override

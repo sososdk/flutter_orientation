@@ -1,3 +1,6 @@
+## 1.0.3
+* Fixed: Android `setSystemChromePreferredOrientations` param cast exception.
+
 ## 1.0.2
 * Fixed: Android orientation.
 

@@ -10,9 +10,8 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import org.json.JSONArray;
-import org.json.JSONException;
 
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_FULL_USER;
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
@@ -83,31 +82,27 @@ public class OrientationPlugin implements MethodCallHandler {
   public void onMethodCall(MethodCall call, Result result) {
     String method = call.method;
     Object arguments = call.arguments;
-    try {
-      if (method.equals("SystemChrome.setPreferredOrientations")) {
-        setSystemChromePreferredOrientations((JSONArray) arguments);
-        result.success(null);
-      } else if (method.equals("SystemChrome.forceOrientation")) {
-        forceOrientation((String) arguments);
-        result.success(null);
-      } else {
-        result.notImplemented();
-      }
-    } catch (JSONException e) {
-      result.error("error", "JSON error: " + e.getMessage(), null);
+    if (method.equals("SystemChrome.setPreferredOrientations")) {
+      setSystemChromePreferredOrientations((List) arguments);
+      result.success(null);
+    } else if (method.equals("SystemChrome.forceOrientation")) {
+      forceOrientation((String) arguments);
+      result.success(null);
+    } else {
+      result.notImplemented();
     }
   }
 
-  private void setSystemChromePreferredOrientations(JSONArray orientations) throws JSONException {
+  private void setSystemChromePreferredOrientations(List orientations) {
     int requestedOrientation = 0x00;
-    for (int index = 0; index < orientations.length(); index += 1) {
-      if (orientations.getString(index).equals("DeviceOrientation.portraitUp")) {
+    for (int index = 0; index < orientations.size(); index += 1) {
+      if (orientations.get(index).equals("DeviceOrientation.portraitUp")) {
         requestedOrientation |= 0x01;
-      } else if (orientations.getString(index).equals("DeviceOrientation.landscapeLeft")) {
+      } else if (orientations.get(index).equals("DeviceOrientation.landscapeLeft")) {
         requestedOrientation |= 0x02;
-      } else if (orientations.getString(index).equals("DeviceOrientation.portraitDown")) {
+      } else if (orientations.get(index).equals("DeviceOrientation.portraitDown")) {
         requestedOrientation |= 0x04;
-      } else if (orientations.getString(index).equals("DeviceOrientation.landscapeRight")) {
+      } else if (orientations.get(index).equals("DeviceOrientation.landscapeRight")) {
         requestedOrientation |= 0x08;
       }
     }
