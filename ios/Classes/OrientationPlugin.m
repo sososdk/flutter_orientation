@@ -13,12 +13,12 @@ const char* const kOrientationUpdateNotificationKey = "io.flutter.plugin.platfor
     OrientationPlugin* instance = [[OrientationPlugin alloc] init];
     
     FlutterMethodChannel* channel = [FlutterMethodChannel
-                                     methodChannelWithName:@"com.github.sososdk/orientation"
+                                     methodChannelWithName:@"sososdk.github.com/orientation"
                                      binaryMessenger:[registrar messenger]];
     [registrar addMethodCallDelegate:instance channel:channel];
     
     FlutterEventChannel* eventChannel = [FlutterEventChannel
-                                         eventChannelWithName:@"com.github.sososdk/orientationEvent"
+                                         eventChannelWithName:@"sososdk.github.com/orientationEvent"
                                          binaryMessenger:[registrar messenger]];
     [eventChannel setStreamHandler:instance];
 }

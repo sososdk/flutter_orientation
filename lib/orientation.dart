@@ -6,10 +6,10 @@ import 'package:flutter/services.dart';
 
 class OrientationPlugin {
   static const _methodChannel =
-      const MethodChannel('com.github.sososdk/orientation');
+      const MethodChannel('sososdk.github.com/orientation');
 
   static const _eventChannel =
-      const EventChannel('com.github.sososdk/orientationEvent');
+      const EventChannel('sososdk.github.com/orientationEvent');
 
   static Future<void> setEnabledSystemUIOverlays(
       List<SystemUiOverlay> overlays) async {

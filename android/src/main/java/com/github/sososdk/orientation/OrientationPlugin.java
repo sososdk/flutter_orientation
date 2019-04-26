@@ -50,10 +50,10 @@ public class OrientationPlugin implements MethodCallHandler {
   /** Plugin registration. */
   public static void registerWith(final Registrar registrar) {
     final OrientationPlugin plugin = new OrientationPlugin(registrar);
-    final MethodChannel channel = new MethodChannel(registrar.messenger(), "com.github.sososdk/orientation");
+    final MethodChannel channel = new MethodChannel(registrar.messenger(), "sososdk.github.com/orientation");
     channel.setMethodCallHandler(plugin);
 
-    EventChannel eventChannel = new EventChannel(registrar.messenger(), "com.github.sososdk/orientationEvent");
+    EventChannel eventChannel = new EventChannel(registrar.messenger(), "sososdk.github.com/orientationEvent");
     eventChannel.setStreamHandler(new EventChannel.StreamHandler() {
       @Override public void onListen(Object o, EventChannel.EventSink eventSink) {
         plugin.enableOrientationEventListener(eventSink);
