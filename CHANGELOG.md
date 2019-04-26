@@ -1,3 +1,6 @@
+## 1.0.5
+* Rename domain
+
 ## 1.0.4
 * Patch for [issues:23913](https://github.com/flutter/flutter/issues/23913) point 4 
 
