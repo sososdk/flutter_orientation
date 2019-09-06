@@ -6,6 +6,7 @@ const char* const kOrientationUpdateNotificationKey = "io.flutter.plugin.platfor
 
 @interface OrientationPlugin ()
 @property id motionManager;
+@property int currentOrientation;
 @end
 
 @implementation OrientationPlugin
@@ -23,10 +24,11 @@ const char* const kOrientationUpdateNotificationKey = "io.flutter.plugin.platfor
     [eventChannel setStreamHandler:instance];
 }
 
--(id)init {
+- (id)init {
     self = [super init];
     NSAssert(self, @"super init cannot be nil");
     self.motionManager = [[CMMotionManager alloc] init];
+    self.currentOrientation = -1;
     return self;
 }
 
@@ -69,7 +71,7 @@ const char* const kOrientationUpdateNotificationKey = "io.flutter.plugin.platfor
                                                       userInfo:@{@(kOrientationUpdateNotificationKey) : @(mask)}];
 }
 
--(void)forceOrientation:(NSString*)orientation {
+- (void)forceOrientation:(NSString*)orientation {
     if ([orientation isEqualToString:@"DeviceOrientation.portraitUp"]) {
         [[UIDevice currentDevice] setValue:@(UIInterfaceOrientationPortrait) forKey:@"orientation"];
     } else if ([orientation isEqualToString:@"DeviceOrientation.portraitDown"]) {
@@ -89,16 +91,22 @@ const char* const kOrientationUpdateNotificationKey = "io.flutter.plugin.platfor
      withHandler:^(CMDeviceMotion* motion, NSError* error) {
          double gravityX = motion.gravity.x;
          double gravityY = motion.gravity.y;
-         double angle = atan2(gravityX, gravityY) / M_PI * 180.0 + 180;
-         int orientation = ((int) angle + 45) % 360 / 90;
-         if (orientation == 0) {
-             eventSink(@{@"event" : @"OrientationChange", @"value" : @"DeviceOrientation.portraitUp"});
-         } else if (orientation == 1) {
-             eventSink(@{@"event" : @"OrientationChange", @"value" : @"DeviceOrientation.landscapeRight"});
-         } else if (orientation == 2) {
-             eventSink(@{@"event" : @"OrientationChange", @"value" : @"DeviceOrientation.portraitDown"});
-         } else if (orientation == 3) {
-             eventSink(@{@"event" : @"OrientationChange", @"value" : @"DeviceOrientation.landscapeLeft"});
+         int angle = round(atan2(gravityX, gravityY) / M_PI * 180.0 + 180);
+         if ((self.currentOrientation == 0 && (angle >= 300 || angle <= 60)) ||
+             (self.currentOrientation == 1 && (angle >= 30 && angle <= 150)) ||
+             (self.currentOrientation == 2 && (angle >= 120 && angle <= 240)) ||
+             (self.currentOrientation == 3 && (angle >= 210 && angle <= 330))) {
+         } else {
+             self.currentOrientation = (angle + 45) % 360 / 90;
+         }
+         if (self.currentOrientation == 0) {
+             eventSink(@"DeviceOrientation.portraitUp");
+         } else if (self.currentOrientation == 1) {
+             eventSink(@"DeviceOrientation.landscapeRight");
+         } else if (self.currentOrientation == 2) {
+             eventSink(@"DeviceOrientation.portraitDown");
+         } else if (self.currentOrientation == 3) {
+             eventSink(@"DeviceOrientation.landscapeLeft");
          }
      }];
     return nil;

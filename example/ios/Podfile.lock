@@ -14,9 +14,9 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/orientation/ios"
 
 SPEC CHECKSUMS:
-  Flutter: 9d0fac939486c9aba2809b7982dfdbb47a7b0296
-  orientation: 206e420b488caf2046f5944a2c72d59c2b542ee6
+  Flutter: 58dd7d1b27887414a370fcccb9e645c08ffd7a6a
+  orientation: 46fe7528896a5c3e6215366bcb462c182ebfd4e9
 
 PODFILE CHECKSUM: aff02bfeed411c636180d6812254b2daeea14d09
 
-COCOAPODS: 1.5.3
+COCOAPODS: 1.7.5

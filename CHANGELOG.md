@@ -1,3 +1,7 @@
+## 1.1.0
+* \[android\] Fix enable system UI overlays
+* Optimize orientations change monitoring
+
 ## 1.0.5
 * Rename domain
 

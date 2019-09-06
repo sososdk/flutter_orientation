@@ -2,42 +2,21 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:orientation/orientation.dart';
 
-// https://github.com/flutter/flutter/issues/28134
+import './orientation_helper.dart';
+
 void main() {
-  OrientationPlugin.setPreferredOrientations(DeviceOrientation.values);
+  OrientationHelper.setPreferredOrientations(DeviceOrientation.values);
+  OrientationHelper.setEnabledSystemUIOverlays(SystemUiOverlay.values);
   runApp(MaterialApp(home: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Orientation Example'),
-      ),
-      body: Center(
-        child: RaisedButton(
-            child: Text('Next'),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) {
-                return NextPage();
-              }));
-            }),
-      ),
-    );
-  }
+  _MyAppState createState() => _MyAppState();
 }
 
-class NextPage extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() {
-    return _NextPageState();
-  }
-}
-
-class _NextPageState extends State<NextPage> {
+class _MyAppState extends State<MyApp> {
   DeviceOrientation _deviceOrientation;
 
   StreamSubscription<DeviceOrientation> subscription;
@@ -45,7 +24,7 @@ class _NextPageState extends State<NextPage> {
   @override
   void initState() {
     super.initState();
-    subscription = OrientationPlugin.onOrientationChange.listen((value) {
+    subscription = OrientationHelper.onOrientationChange.listen((value) {
       // If the widget was removed from the tree while the asynchronous platform
       // message was in flight, we want to discard the reply rather than calling
       // setState to update our non-existent appearance.
@@ -55,25 +34,58 @@ class _NextPageState extends State<NextPage> {
         _deviceOrientation = value;
       });
 
-      OrientationPlugin.forceOrientation(value);
+      OrientationHelper.forceOrientation(value);
     });
   }
 
   @override
   void dispose() {
-    subscription?.cancel();
+    _dispose();
     super.dispose();
+  }
+
+  // https://github.com/flutter/flutter/issues/28134
+  void _dispose() {
+    subscription?.cancel();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Orientation'),
-      ),
-      body: Center(
-        child: Text(
-            'Running on: ${_deviceOrientation ?? 'Unknown Orientation'}\n'),
+    return WillPopScope(
+      onWillPop: () {
+        _dispose();
+        return Future.value(true);
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Orientation Example'),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text(
+                  'Running on: ${_deviceOrientation ?? 'Unknown Orientation'}\n'),
+              RaisedButton(
+                  child: Text('FullScreen'),
+                  onPressed: () {
+                    OrientationHelper.setEnabledSystemUIOverlays([]);
+                  }),
+              RaisedButton(
+                  child: Text('NormalScreen'),
+                  onPressed: () {
+                    OrientationHelper.setEnabledSystemUIOverlays(
+                        SystemUiOverlay.values);
+                  }),
+              Spacer(),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                    'Flutter is Google’s UI toolkit for building beautiful, natively compiled applications for mobile, web, and desktop from a single codebase.'),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

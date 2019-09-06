@@ -48,13 +48,9 @@ class OrientationPlugin {
 
   static Stream<DeviceOrientation> get onOrientationChange {
     if (_onOrientationChange == null) {
-      _onOrientationChange =
-          _eventChannel.receiveBroadcastStream().map((event) {
-        final Map<dynamic, dynamic> map = event;
-        if (map['event'] == 'OrientationChange') {
-          return _convert(map['value']);
-        }
-      });
+      _onOrientationChange = _eventChannel
+          .receiveBroadcastStream()
+          .map((event) => _convert(event));
     }
     return _onOrientationChange;
   }

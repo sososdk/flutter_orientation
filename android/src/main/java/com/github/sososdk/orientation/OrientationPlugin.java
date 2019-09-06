@@ -1,7 +1,6 @@
 package com.github.sososdk.orientation;
 
 import android.app.Activity;
-import android.util.Log;
 import android.view.OrientationEventListener;
 import android.view.View;
 import io.flutter.plugin.common.EventChannel;
@@ -10,9 +9,7 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_FULL_USER;
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
@@ -29,19 +26,14 @@ public class OrientationPlugin implements MethodCallHandler {
   private final Activity activity;
   private final OrientationEventListener orientationEventListener;
   private EventChannel.EventSink eventSink;
+  private int currentOrientation = SCREEN_ORIENTATION_UNSPECIFIED;
 
   public OrientationPlugin(Registrar registrar) {
     this.activity = registrar.activity();
     this.orientationEventListener = new OrientationEventListener(activity) {
       @Override public void onOrientationChanged(int angle) {
         if (eventSink != null) {
-          try {
-            sendOrientationChange(eventSink, convertAngle(angle));
-          } catch (RuntimeException e) {
-            // Cannot execute operation because FlutterJNI is not attached to native.
-            // https://github.com/flutter/flutter/issues/28134
-            Log.w("OrientationPlugin", e);
-          }
+          sendOrientationChange(eventSink, convertAngle(angle));
         }
       }
     };
@@ -103,18 +95,16 @@ public class OrientationPlugin implements MethodCallHandler {
         | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
         | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-        | View.SYSTEM_UI_FLAG_IMMERSIVE | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-
-    if (overlaysToShow.size() == 0) {
-      enabledOverlays |= View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-    } else {
-      // Re-add any desired system overlays.
-      for (int i = 0; i < overlaysToShow.size(); ++i) {
-        if (overlaysToShow.get(i).equals("SystemUiOverlay.top")) {
-          enabledOverlays |= View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
-        } else if (overlaysToShow.get(i).equals("SystemUiOverlay.bottom")) {
-          enabledOverlays |= View.SYSTEM_UI_FLAG_FULLSCREEN;
-        }
+        | View.SYSTEM_UI_FLAG_IMMERSIVE
+        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+        | View.SYSTEM_UI_FLAG_FULLSCREEN
+        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
+    // Re-add any desired system overlays.
+    for (int i = 0; i < overlaysToShow.size(); ++i) {
+      if (overlaysToShow.get(i).equals("SystemUiOverlay.top")) {
+        enabledOverlays &= ~View.SYSTEM_UI_FLAG_FULLSCREEN;
+      } else if (overlaysToShow.get(i).equals("SystemUiOverlay.bottom")) {
+        enabledOverlays &= ~View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
       }
     }
     activity.getWindow().getDecorView().setSystemUiVisibility(enabledOverlays);
@@ -192,10 +182,7 @@ public class OrientationPlugin implements MethodCallHandler {
   private static void sendOrientationChange(EventChannel.EventSink eventSink, int orientation) {
     String value = orientation(orientation);
     if (value != null) {
-      Map<String, Object> event = new HashMap<>();
-      event.put("event", "OrientationChange");
-      event.put("value", value);
-      eventSink.success(event);
+      eventSink.success(value);
     }
   }
 
@@ -213,15 +200,22 @@ public class OrientationPlugin implements MethodCallHandler {
     }
   }
 
-  private static int convertAngle(int angle) {
-    int orientation = (angle + 45) % 360 / 90;
-    if (orientation == 0) {
+  private int convertAngle(int angle) {
+    if ((currentOrientation == 0 && (angle >= 300 || angle <= 60)) ||
+        (currentOrientation == 1 && (angle >= 30 && angle <= 150)) ||
+        (currentOrientation == 2 && (angle >= 120 && angle <= 240)) ||
+        (currentOrientation == 3 && (angle >= 210 && angle <= 330))) {
+    } else {
+      currentOrientation = (angle + 45) % 360 / 90;
+    }
+
+    if (currentOrientation == 0) {
       return SCREEN_ORIENTATION_PORTRAIT;
-    } else if (orientation == 1) {
+    } else if (currentOrientation == 1) {
       return SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
-    } else if (orientation == 2) {
+    } else if (currentOrientation == 2) {
       return SCREEN_ORIENTATION_REVERSE_PORTRAIT;
-    } else if (orientation == 3) {
+    } else if (currentOrientation == 3) {
       return SCREEN_ORIENTATION_LANDSCAPE;
     } else {
       return SCREEN_ORIENTATION_UNSPECIFIED;
