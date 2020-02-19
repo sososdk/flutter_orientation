@@ -1,3 +1,6 @@
+## 1.2.0
+* Re-land support for the v2 Android embedding.
+
 ## 1.1.0
 * \[android\] Fix enable system UI overlays
 * Optimize orientations change monitoring

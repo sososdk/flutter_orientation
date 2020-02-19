@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import './orientation_helper.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   OrientationHelper.setPreferredOrientations(DeviceOrientation.values);
   OrientationHelper.setEnabledSystemUIOverlays(SystemUiOverlay.values);
   runApp(MaterialApp(home: MyApp()));

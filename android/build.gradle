@@ -1,34 +1,34 @@
 group 'com.github.sososdk.orientation'
-version '1.0-SNAPSHOT'
+version '1.0'
 
 buildscript {
-  repositories {
-    google()
-    jcenter()
-  }
+    repositories {
+        google()
+        jcenter()
+    }
 
-  dependencies {
-    classpath 'com.android.tools.build:gradle:3.5.0'
-  }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.5.0'
+    }
 }
 
 rootProject.allprojects {
-  repositories {
-    google()
-    jcenter()
-  }
+    repositories {
+        google()
+        jcenter()
+    }
 }
 
 apply plugin: 'com.android.library'
 
 android {
-  compileSdkVersion 28
+    compileSdkVersion 28
 
-  defaultConfig {
-    minSdkVersion 16
-    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-  }
-  lintOptions {
-    disable 'InvalidPackage'
-  }
+    defaultConfig {
+        minSdkVersion 16
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    lintOptions {
+        disable 'InvalidPackage'
+    }
 }

@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   const MethodChannel channel = MethodChannel('orientation');
 
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   setUp(() {
     channel.setMockMethodCallHandler((MethodCall methodCall) async {
       return '42';
