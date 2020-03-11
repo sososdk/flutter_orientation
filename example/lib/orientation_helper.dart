@@ -24,7 +24,7 @@ class OrientationHelper {
 
   static Stream<DeviceOrientation> get onOrientationChange {
     if (_onOrientationChange == null) {
-      _onOrientationChange = Observable(OrientationPlugin.onOrientationChange)
+      _onOrientationChange = OrientationPlugin.onOrientationChange
           .shareValueSeeded(initOrientation)
           .distinct((previous, next) => previous == next);
     }

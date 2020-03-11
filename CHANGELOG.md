@@ -1,3 +1,8 @@
+## 1.2.1
+* Add docs
+* Revert README.md
+* Update dependencies for example
+
 ## 1.2.0
 * Re-land support for the v2 Android embedding.
 

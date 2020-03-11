@@ -11,6 +11,7 @@ class OrientationPlugin {
   static const _eventChannel =
       const EventChannel('sososdk.github.com/orientationEvent');
 
+  /// see [SystemChrome.setEnabledSystemUIOverlays]
   static Future<void> setEnabledSystemUIOverlays(
       List<SystemUiOverlay> overlays) async {
     if (Platform.isAndroid) {
@@ -23,6 +24,7 @@ class OrientationPlugin {
     }
   }
 
+  /// see [SystemChrome.setPreferredOrientations]
   static Future<void> setPreferredOrientations(
       List<DeviceOrientation> orientations) async {
     await _methodChannel.invokeMethod<void>(
@@ -31,6 +33,7 @@ class OrientationPlugin {
     );
   }
 
+  /// Force change of orientation
   static Future<void> forceOrientation(DeviceOrientation orientation) async {
     await _methodChannel.invokeMethod<void>(
       'SystemChrome.forceOrientation',
