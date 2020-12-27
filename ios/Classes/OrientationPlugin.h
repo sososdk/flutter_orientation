@@ -1,4 +1,4 @@
 #import <Flutter/Flutter.h>
 
-@interface OrientationPlugin : NSObject<FlutterPlugin, FlutterStreamHandler>
+@interface OrientationPlugin : NSObject<FlutterPlugin>
 @end
