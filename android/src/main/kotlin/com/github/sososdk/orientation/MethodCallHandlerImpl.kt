@@ -1,8 +1,9 @@
 package com.github.sososdk.orientation
 
 import android.app.Activity
+import android.content.Context
 import android.content.pm.ActivityInfo
-import android.view.OrientationEventListener
+import android.provider.Settings
 import android.view.View
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.EventChannel
@@ -10,6 +11,7 @@ import io.flutter.plugin.common.EventChannel.EventSink
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
+
 
 class MethodCallHandlerImpl : MethodCallHandler {
     companion object {
@@ -34,8 +36,7 @@ class MethodCallHandlerImpl : MethodCallHandler {
     private var activity: Activity? = null
     private lateinit var channel: MethodChannel
     private lateinit var eventChannel: EventChannel
-    private var orientationEventListener: OrientationEventListener? = null
-    private var currentOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+    private var orientationListener: OrientationListener? = null
 
     /**
      * Registers this instance as a method call handler on the given `messenger`.
@@ -53,21 +54,22 @@ class MethodCallHandlerImpl : MethodCallHandler {
         eventChannel = EventChannel(messenger, "sososdk.github.com/orientationEvent")
         eventChannel.setStreamHandler(object : EventChannel.StreamHandler {
             override fun onListen(arguments: Any?, eventSink: EventSink) {
-                val orientationEventListener: OrientationEventListener = object : OrientationEventListener(activity) {
-                    override fun onOrientationChanged(angle: Int) {
-                        sendOrientationChange(eventSink, convertAngle(angle))
+                val orientationListener: OrientationListener = object : OrientationListener(activity!!) {
+                    override fun onOrientationChanged(orientation: Int) {
+                        sendOrientationChange(eventSink, orientation)
+//                        println("-------:" + orientationToString(orientation))
                     }
                 }
-                if (orientationEventListener.canDetectOrientation()) {
-                    orientationEventListener.enable()
+                if (orientationListener.canDetectOrientation()) {
+                    orientationListener.enable()
                 } else {
                     eventSink.error("SensorError", "Cannot detect sensors. Not enabled", null)
                 }
             }
 
             override fun onCancel(o: Any) {
-                orientationEventListener?.disable()
-                orientationEventListener = null
+                orientationListener?.disable()
+                orientationListener = null
             }
         })
     }
@@ -102,6 +104,9 @@ class MethodCallHandlerImpl : MethodCallHandler {
             "SystemChrome.forceOrientation" -> {
                 forceOrientation(arguments as String)
                 result.success(null)
+            }
+            "SystemChrome.isAutoRotating" -> {
+                result.success(isAutoRotating(context = activity!!.applicationContext))
             }
             else -> result.notImplemented()
         }
@@ -165,19 +170,17 @@ class MethodCallHandlerImpl : MethodCallHandler {
         }
     }
 
-    private fun convertAngle(angle: Int): Int {
-        if (!(currentOrientation == 0 && (angle >= 300 || angle <= 60) ||
-                        currentOrientation == 1 && angle >= 30 && angle <= 150 ||
-                        currentOrientation == 2 && angle >= 120 && angle <= 240 ||
-                        currentOrientation == 3 && angle >= 210 && angle <= 330)) {
-            currentOrientation = (angle + 45) % 360 / 90
-        }
-        return when (currentOrientation) {
-            0 -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            1 -> ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
-            2 -> ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT
-            3 -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-            else -> ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+    private fun isAutoRotating(context: Context): Boolean {
+        return Settings.System.getInt(context.contentResolver, Settings.System.ACCELEROMETER_ROTATION, 0) == 1
+    }
+
+    private fun orientationToString(orientation: Int): String {
+        return when (orientation) {
+            ActivityInfo.SCREEN_ORIENTATION_PORTRAIT -> "DeviceOrientation.portraitUp"
+            ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT -> "DeviceOrientation.portraitDown"
+            ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE -> "DeviceOrientation.landscapeLeft"
+            ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE -> "DeviceOrientation.landscapeRight"
+            else -> "DeviceOrientation.UNSPECIFIED"
         }
     }
 }

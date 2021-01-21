@@ -41,6 +41,11 @@ class OrientationPlugin {
     );
   }
 
+  /// Get Auto-Rotation state for Android
+  static Future<bool> isAutoRotating() async {
+    return _methodChannel.invokeMethod<bool>('SystemChrome.isAutoRotating');
+  }
+
   static List<String> _stringify(List<dynamic> list) {
     final List<String> result = <String>[];
     for (dynamic item in list) result.add(item.toString());
