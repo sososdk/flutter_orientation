@@ -47,7 +47,7 @@ class OrientationPlugin {
     return result;
   }
 
-  static Stream<DeviceOrientation> _onOrientationChange;
+  static Stream<DeviceOrientation>? _onOrientationChange;
 
   static Stream<DeviceOrientation> get onOrientationChange {
     if (_onOrientationChange == null) {
@@ -55,7 +55,7 @@ class OrientationPlugin {
           .receiveBroadcastStream()
           .map((event) => _convert(event));
     }
-    return _onOrientationChange;
+    return _onOrientationChange!;
   }
 
   static DeviceOrientation _convert(String value) {

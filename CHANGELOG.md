@@ -1,3 +1,6 @@
+## 1.3.0
+* Migrate to null safety.
+
 ## 1.2.1
 * Add docs
 * Revert README.md
